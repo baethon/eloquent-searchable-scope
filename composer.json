@@ -1,0 +1,30 @@
+{
+    "name": "baethon/eloquent-searchable-scope",
+    "description": "Dead simple model scope used for searching",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Radoslaw Mejer",
+            "email": "radmen@baethon.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Baethon\\Laravel\\Scopes\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Stubs\\": "tests/stubs"
+        }
+    },
+    "require": {},
+    "require-dev": {
+        "orchestra/testbench": "^6.11",
+        "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
