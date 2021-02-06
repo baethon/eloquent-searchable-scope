@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Baethon\Laravel\Scopes\SearchableOptions;
 use Orchestra\Testbench\TestCase;
 use Tests\Stubs\Post;
 use Tests\Stubs\Role;
@@ -110,5 +111,24 @@ class SearchableTest extends TestCase
             ->search('admi')
             ->count()
         );
+    }
+
+    public function test_it_breaks_words()
+    {
+        Post::insert([
+            ['post' => 'Who does the gun belong to?'],
+            ['post' => 'Look at that mountain.'],
+            ['post' => 'I never for a moment imagined I\'d be able to afford to live in such a fancy house.'],
+        ]);
+
+        $model = Post::overloadSearchable(
+            ['post'],
+            SearchableOptions::BREAK_WORDS
+        );
+        $results = $model->newQuery()
+            ->search('gun does the')
+            ->get();
+
+        $this->assertEquals(1, $results->count());
     }
 }

@@ -8,17 +8,10 @@ use Illuminate\Support\Str;
 
 trait Searchable
 {
-    protected array $defaultSearchOptions = [
-        'break_words' => false,
-    ];
-
     public function scopeSearch(Builder $query, ?string $search)
     {
         $searchTerm = trim($search ?? '');
-        $options = array_merge(
-            $this->defaultSearchOptions,
-            $this->searchOptions ?? [],
-        );
+        $options = $this->searchOptions ?? 0;
 
         if (! $searchTerm || mb_strlen($searchTerm) < 3) {
             return;
@@ -57,9 +50,9 @@ trait Searchable
         });
     }
 
-    private function breakToWords($searchTerm, array $options): Collection
+    private function breakToWords($searchTerm, int $options): Collection
     {
-        if (! $options['break_words']) {
+        if ($options ^ SearchableOptions::BREAK_WORDS) {
             return collect(["%{$searchTerm}%"]);
         }
 

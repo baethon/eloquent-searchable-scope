@@ -17,14 +17,17 @@ class Post extends Model
         'post',
     ];
 
-    public static function overloadSearchable(array $searchableFields): Post
+    public static function overloadSearchable(array $searchableFields, int $options = 0): Post
     {
-        return new class ($searchableFields) extends Post {
+        return new class ($searchableFields, $options) extends Post {
             protected $table = 'posts';
 
-            public function __construct($searchableFields)
+            protected int $searchOptions = 0;
+
+            public function __construct($searchableFields, $options = 0)
             {
                 $this->searchable = $searchableFields;
+                $this->searchOptions = $options;
             }
         };
     }
