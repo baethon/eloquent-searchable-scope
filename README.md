@@ -18,7 +18,7 @@ composer require baethon/eloquent-searchable-scope
 
 Import `Searchable` trait and use it in model:
 
-```
+```php
 <?php
 
 namespace App\Models;
