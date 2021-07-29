@@ -62,7 +62,7 @@ trait Searchable
             return collect(["%{$searchTerm}%"]);
         }
 
-        return collect(preg_split('/\W+/', $searchTerm))
+        return collect(preg_split('/\s+/', $searchTerm))
             ->map(fn ($value) => trim($value))
             ->reject(fn ($value) => mb_strlen($value) < 3)
             ->map(fn ($value) => "%{$value}%");
