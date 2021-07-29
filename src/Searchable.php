@@ -10,6 +10,12 @@ trait Searchable
 {
     public function scopeSearch(Builder $query, ?string $search)
     {
+        $connection = config('database.default');
+        $driver = config("database.connections.{$connection}.driver");
+        $operator = ($driver === 'pgsql')
+            ? 'ILIKE'
+            : 'LIKE';
+
         $searchTerm = trim($search ?? '');
         $options = $this->searchOptions ?? 0;
 
@@ -31,9 +37,9 @@ trait Searchable
                 fn ($relation) => preg_replace('/^.*\.(\w+)$/', '$1', $relation)
             ));
 
-        $applyWords = function ($field, $searchWords) {
+        $applyWords = function ($field, $searchWords) use ($operator) {
             return fn ($innerQuery) => $searchWords->each(
-                fn ($word) => $innerQuery->where($field, 'LIKE', $word)
+                fn ($word) => $innerQuery->where($field, $operator, $word)
             );
         };
 
