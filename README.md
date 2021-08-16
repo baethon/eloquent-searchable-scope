@@ -74,6 +74,18 @@ class Post extends Model
 
 Note: the scope will use only words with length >= 3.
 
+## Overloading search fields
+
+It's possible to define the searchable fields when calling `search()` scope:
+
+```php
+$foundPosts = Post::query()
+    ->search($search, [
+        'title',
+    ])
+    ->get();
+```
+
 # Nothing new here!
 
 This scope has been discussed in [🔗 other](https://freek.dev/1182-searching-models-using-a-where-like-query-in-laravel) [🔗 places](https://laravel-tricks.com/tricks/eloquents-dynamic-scope-search-trait).

@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 trait Searchable
 {
-    public function scopeSearch(Builder $query, ?string $search)
+    public function scopeSearch(Builder $query, ?string $search, ?array $searchableFields = null)
     {
         $connection = config('database.default');
         $driver = config("database.connections.{$connection}.driver");
@@ -25,7 +25,7 @@ trait Searchable
 
         $searchWords = $this->breakToWords($searchTerm, $options);
 
-        $searchable = $this->searchable ?? [];
+        $searchable = $searchableFields ?? $this->searchable ?? [];
         [$relations, $fields] = collect($searchable)
             ->partition(fn ($field) => Str::contains($field, '.'));
 
