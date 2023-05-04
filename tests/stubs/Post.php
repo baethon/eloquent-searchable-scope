@@ -17,19 +17,24 @@ class Post extends Model
         'post',
     ];
 
+    protected $searchOptions = 0;
+
+    protected static ?array $searchableOverrides = null;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        optional(static::$searchableOverrides, function ($config) {
+            $this->searchable = $config['searchableFields'];
+            $this->searchOptions = $config['options'];
+        });
+    }
+
     public static function overloadSearchable(array $searchableFields, int $options = 0): Post
     {
-        return new class ($searchableFields, $options) extends Post {
-            protected $table = 'posts';
-
-            protected int $searchOptions = 0;
-
-            public function __construct($searchableFields, $options = 0)
-            {
-                $this->searchable = $searchableFields;
-                $this->searchOptions = $options;
-            }
-        };
+        static::$searchableOverrides = compact('searchableFields', 'options');
+        return new static();
     }
 
     public function user()

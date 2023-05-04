@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Baethon\Laravel\Scopes\SearchableOptions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase;
 use Tests\Stubs\Post;
 use Tests\Stubs\Role;
@@ -10,9 +11,10 @@ use Tests\Stubs\User;
 
 class SearchableTest extends TestCase
 {
-    protected function setUp(): void
+    use RefreshDatabase;
+
+    protected function defineDatabaseMigrations()
     {
-        parent::setUp();
         $this->loadMigrationsFrom(__DIR__.'/migrations');
     }
 
