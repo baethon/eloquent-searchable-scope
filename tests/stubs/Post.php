@@ -3,6 +3,7 @@
 namespace Tests\Stubs;
 
 use Baethon\Laravel\Scopes\Searchable;
+use Baethon\Laravel\Scopes\SearchableOptions;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
@@ -13,27 +14,18 @@ class Post extends Model
 
     protected $fillable = ['post'];
 
-    protected $searchable = [
-        'post',
-    ];
+    public static ?SearchableOptions $searchableOverride = null;
 
-    protected $searchOptions = 0;
-
-    protected static ?array $searchableOverrides = null;
-
-    public function __construct(array $attributes = [])
+    public function getSearchableOptions(): SearchableOptions
     {
-        parent::__construct($attributes);
-
-        optional(static::$searchableOverrides, function ($config) {
-            $this->searchable = $config['searchableFields'];
-            $this->searchOptions = $config['options'];
-        });
+        return static::$searchableOverride
+            ?? SearchableOptions::defaults()
+                ->fields(['post']);
     }
 
-    public static function overloadSearchable(array $searchableFields, int $options = 0): Post
+    public static function overloadSearchable(SearchableOptions $options): Post
     {
-        static::$searchableOverrides = compact('searchableFields', 'options');
+        static::$searchableOverride = $options;
         return new static();
     }
 

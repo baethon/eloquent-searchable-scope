@@ -8,8 +8,13 @@ use Illuminate\Support\Str;
 
 trait Searchable
 {
+    abstract public function getSearchableOptions(): SearchableOptions;
+
     public function scopeSearch(Builder $query, ?string $search, ?array $searchableFields = null)
     {
+        $options = $this->getSearchableOptions();
+        optional($searchableFields, $options->fields(...));
+
         $connection = config('database.default');
         $driver = config("database.connections.{$connection}.driver");
         $operator = ($driver === 'pgsql')
@@ -17,15 +22,14 @@ trait Searchable
             : 'LIKE';
 
         $searchTerm = trim($search ?? '');
-        $options = $this->searchOptions ?? 0;
 
-        if (! $searchTerm || mb_strlen($searchTerm) < 3) {
+        if (! $searchTerm || mb_strlen($searchTerm) < $options->getMinLength()) {
             return;
         }
 
         $searchWords = $this->breakToWords($searchTerm, $options);
 
-        $searchable = $searchableFields ?? $this->searchable ?? [];
+        $searchable = $options->getFields();
         [$relations, $fields] = collect($searchable)
             ->partition(fn ($field) => Str::contains($field, '.'));
 
@@ -56,15 +60,15 @@ trait Searchable
         });
     }
 
-    private function breakToWords($searchTerm, int $options): Collection
+    private function breakToWords($searchTerm, SearchableOptions $options): Collection
     {
-        if ($options ^ SearchableOptions::BREAK_WORDS) {
+        if (! $options->shouldBreakToWords()) {
             return collect(["%{$searchTerm}%"]);
         }
 
         return collect(preg_split('/\s+/', $searchTerm))
             ->map(fn ($value) => trim($value))
-            ->reject(fn ($value) => mb_strlen($value) < 3)
+            ->reject(fn ($value) => mb_strlen($value) < $options->getMinLength())
             ->map(fn ($value) => "%{$value}%");
     }
 }

@@ -13,6 +13,12 @@ class SearchableTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        Post::$searchableOverride = null;
+    }
+
     protected function defineDatabaseMigrations()
     {
         $this->loadMigrationsFrom(__DIR__.'/migrations');
@@ -47,9 +53,11 @@ class SearchableTest extends TestCase
             new Post(['post' => 'I never for a moment imagined I\'d be able to afford to live in such a fancy house.']),
         ]);
 
-        $model = Post::overloadSearchable([
-            'user.email',
-        ]);
+        $model = Post::overloadSearchable(
+            SearchableOptions::defaults()->fields([
+                'user.email',
+            ])
+        );
 
         $this->assertEquals(2, $model->newQuery()
             ->search('jon')
@@ -100,10 +108,12 @@ class SearchableTest extends TestCase
             new Post(['post' => 'Who does the gun belong to?']),
         ]);
 
-        $model = Post::overloadSearchable([
-            'user.email',
-            'post',
-        ]);
+        $model = Post::overloadSearchable(
+            SearchableOptions::defaults()->fields([
+                'user.email',
+                'post',
+            ])
+        );
 
         $this->assertEquals(2, $model->newQuery()
             ->search('jon')
@@ -129,9 +139,11 @@ class SearchableTest extends TestCase
             new Post(['post' => 'I never for a moment imagined I\'d be able to afford to live in such a fancy house.']),
         ]);
 
-        $model = Post::overloadSearchable([
-            'user.role.name',
-        ]);
+        $model = Post::overloadSearchable(
+            SearchableOptions::defaults()->fields([
+                'user.role.name',
+            ])
+        );
 
         $this->assertEquals(1, $model->newQuery()
             ->search('admi')
@@ -148,9 +160,11 @@ class SearchableTest extends TestCase
         ]);
 
         $model = Post::overloadSearchable(
-            ['post'],
-            SearchableOptions::BREAK_WORDS
+            SearchableOptions::defaults()
+                ->fields(['post'])
+                ->breakToWords(),
         );
+
         $results = $model->newQuery()
             ->search('gun does the')
             ->get();
