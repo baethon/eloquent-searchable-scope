@@ -58,4 +58,9 @@ final class SearchableOptions
     {
         return $this->options & static::BREAK_WORDS;
     }
+
+    public function hasSearchableFields(): bool
+    {
+        return ! empty($this->fields);
+    }
 }

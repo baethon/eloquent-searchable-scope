@@ -3,8 +3,6 @@
 namespace Baethon\Laravel\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 trait Searchable
 {
@@ -15,31 +13,23 @@ trait Searchable
         $options = $this->getSearchableOptions();
         optional($searchableFields, $options->fields(...));
 
+        if (! $options->hasSearchableFields()) {
+            throw new \BadMethodCallException('You have to define at least one searchable field');
+        }
+
+        $searchWords = SearchableHelpers::getSearchTerms($search ?? '', $options);
+
+        if ($searchWords->isEmpty()) {
+            return;
+        }
+
         $connection = config('database.default');
         $driver = config("database.connections.{$connection}.driver");
         $operator = ($driver === 'pgsql')
             ? 'ILIKE'
             : 'LIKE';
 
-        $searchTerm = trim($search ?? '');
-
-        if (! $searchTerm || mb_strlen($searchTerm) < $options->getMinTermLength()) {
-            return;
-        }
-
-        $searchWords = $this->breakToWords($searchTerm, $options);
-
-        $searchable = $options->getFields();
-        [$relations, $fields] = collect($searchable)
-            ->partition(fn ($field) => Str::contains($field, '.'));
-
-        $groupedRelations = $relations
-            ->groupBy(
-                fn ($relation) => preg_replace('/\.\w+?$/', '', $relation)
-            )
-            ->map(fn ($list) => $list->map(
-                fn ($relation) => preg_replace('/^.*\.(\w+)$/', '$1', $relation)
-            ));
+        [$groupedRelations, $fields] = SearchableHelpers::splitSearchableFields($options);
 
         $applyWords = function ($field, $searchWords) use ($operator) {
             return fn ($innerQuery) => $searchWords->each(
@@ -58,17 +48,5 @@ trait Searchable
                 });
             });
         });
-    }
-
-    private function breakToWords($searchTerm, SearchableOptions $options): Collection
-    {
-        if (! $options->shouldBreakToWords()) {
-            return collect(["%{$searchTerm}%"]);
-        }
-
-        return collect(preg_split('/\s+/', $searchTerm))
-            ->map(fn ($value) => trim($value))
-            ->reject(fn ($value) => mb_strlen($value) < $options->getMinTermLength())
-            ->map(fn ($value) => "%{$value}%");
     }
 }
