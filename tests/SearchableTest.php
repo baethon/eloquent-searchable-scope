@@ -171,4 +171,28 @@ class SearchableTest extends TestCase
 
         $this->assertEquals(1, $results->count());
     }
+
+    public function test_it_allows_overloading_searchable_options()
+    {
+        $jon = User::create(['email' => 'jon@stark.com']);
+        $sansa = User::create(['email' => 'sansa@stark.com']);
+
+        $jon->posts()->saveMany([
+            new Post(['post' => 'Who does the gun belong to?']),
+            new Post(['post' => 'Look at that mountain.']),
+        ]);
+
+        $sansa->posts()->saveMany([
+            new Post(['post' => 'I never for a moment imagined I\'d be able to afford to live in such a fancy house.']),
+        ]);
+
+        $this->assertEquals(2, Post::query()
+            ->search('jon', SearchableOptions::defaults()->fields(['user.email']))
+            ->count()
+        );
+        $this->assertEquals(0, Post::query()
+            ->search('the gun', SearchableOptions::defaults()->fields(['user.email']))
+            ->count()
+        );
+    }
 }

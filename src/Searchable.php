@@ -8,10 +8,15 @@ trait Searchable
 {
     abstract public function getSearchableOptions(): SearchableOptions;
 
-    public function scopeSearch(Builder $query, ?string $search, ?array $searchableFields = null)
+    public function scopeSearch(Builder $query, ?string $search, SearchableOptions|array|null $searchableFields = null)
     {
-        $options = $this->getSearchableOptions();
-        optional($searchableFields, $options->fields(...));
+        $options = ($searchableFields instanceof SearchableOptions)
+            ? $searchableFields
+            : $this->getSearchableOptions();
+
+        if (is_array($searchableFields)) {
+            optional($searchableFields, $options->fields(...));
+        }
 
         if (! $options->hasSearchableFields()) {
             throw new \BadMethodCallException('You have to define at least one searchable field');
