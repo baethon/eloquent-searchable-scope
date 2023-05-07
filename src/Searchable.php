@@ -23,7 +23,7 @@ trait Searchable
 
         $searchTerm = trim($search ?? '');
 
-        if (! $searchTerm || mb_strlen($searchTerm) < $options->getMinLength()) {
+        if (! $searchTerm || mb_strlen($searchTerm) < $options->getMinTermLength()) {
             return;
         }
 
@@ -68,7 +68,7 @@ trait Searchable
 
         return collect(preg_split('/\s+/', $searchTerm))
             ->map(fn ($value) => trim($value))
-            ->reject(fn ($value) => mb_strlen($value) < $options->getMinLength())
+            ->reject(fn ($value) => mb_strlen($value) < $options->getMinTermLength())
             ->map(fn ($value) => "%{$value}%");
     }
 }

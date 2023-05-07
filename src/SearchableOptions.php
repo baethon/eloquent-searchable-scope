@@ -25,7 +25,12 @@ final class SearchableOptions
         return $this;
     }
 
-    public function minLength(int $minLength): SearchableOptions
+    /**
+     * Exclude strings shorter than the minimum length
+     *
+     * When using `breakToWords`, words shorter than the minimum length will be removed.
+     */
+    public function minTermLength(int $minLength): SearchableOptions
     {
         $this->minLength = $minLength;
 
@@ -44,7 +49,7 @@ final class SearchableOptions
         return $this->fields;
     }
 
-    public function getMinLength(): int
+    public function getMinTermLength(): int
     {
         return $this->minLength;
     }
