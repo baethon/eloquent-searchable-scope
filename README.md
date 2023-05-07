@@ -1,6 +1,6 @@
 # baethon/eloquent-searchable-scope
 
-A dead-simple Eloquent scope that builds a search query using `LIKE` statements. Supports searching using relations.
+An Eloquent scope for building a search query using LIKE statements, which also supports searching using relations.
 
 ```php
 $foundPosts = Post::query()
@@ -19,8 +19,6 @@ composer require baethon/eloquent-searchable-scope
 Import `Searchable` trait and use it in model:
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Baethon\Laravel\Scopes\Searchable;
@@ -31,32 +29,9 @@ class Post extends Model
 }
 ```
 
-Then, define the list of fields that should be used for searching.
+Trait requires defining the `getSearchableOptions()` method:
 
 ```php
-<?php
-
-namespace App\Models;
-
-use Baethon\Laravel\Scopes\Searchable;
-
-class Post extends Model
-{
-    use Searchable;
-
-    protected $searchable = ['topic', 'text', 'user.email'];
-}
-```
-
-Note: `user.email` refers to `user` relation that has to be defined in the model.
-
-## Breaking by words
-
-By default, the scope will use the full search term in the query. To break the search term to words, you'll have to define `$searchOptions` property:
-
-```php
-<?php
-
 namespace App\Models;
 
 use Baethon\Laravel\Scopes\Searchable;
@@ -65,18 +40,34 @@ use Baethon\Laravel\Scopes\SearchableOptions;
 class Post extends Model
 {
     use Searchable;
-
-    protected $searchable = ['topic', 'text', 'user.email'];
-
-    protected $searchOptions = SearchableOptions::BREAK_WORDS;
+    
+    public function getSearchableOptions(): SearchableOptions
+    {
+        return SearchableOptions::defaults()
+            ->fields(['topic', 'text', 'user.email'];
+    }
 }
 ```
 
-Note: the scope will use only words with length >= 3.
+Note: `user.email` refers to `user` relation. It has to be defined in the model.
 
-## Overloading search fields
+## Available Options
 
-It's possible to define the searchable fields when calling `search()` scope:
+The `SearchableOptions` provides the ability to customize the search functionality in a few ways:
+
+- `breakToWords()` - splits the search term into words and searches against each of them.
+- `minTermLength(int $minLength)` - rejects any string/word that is shorter than the specified number of characters.
+- `fields(array $fields)` - specifies the fields to be used in the search.
+
+The `SearchableOptions::defaults()` is equivalent of:
+
+```php
+(new SearchableOptions)->minTermLength(3);
+```
+
+## Overloading search options
+
+When using the `search()` scope, it is possible to define the searchable fields.
 
 ```php
 $foundPosts = Post::query()
@@ -86,13 +77,19 @@ $foundPosts = Post::query()
     ->get();
 ```
 
+or, pass custom options object:
+
+```php
+$foundPosts = Post::query()
+    ->search($search, SearchableOptions::defaults()->fields(['title'])
+    ->get();
+```
+
+If passing a custom options object, ensure that the searchable fields are defined.
+
 # Nothing new here!
 
-This scope has been discussed in [🔗 other](https://freek.dev/1182-searching-models-using-a-where-like-query-in-laravel) [🔗 places](https://laravel-tricks.com/tricks/eloquents-dynamic-scope-search-trait).
-
-Every time I had to find them, so I decided to make a package that will be easy to install.
-
-I didn't discover anything new here!
+The idea for this scope has been previously discussed in various places, such as [🔗 other](https://freek.dev/1182-searching-models-using-a-where-like-query-in-laravel) and [🔗 places](https://laravel-tricks.com/tricks/eloquents-dynamic-scope-search-trait). However, since it can be difficult to locate these resources every time one needs them, I have created a package that simplifies the installation process. It is important to note that this package does not introduce any novel concepts.
 
 # Testing
 
