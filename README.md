@@ -89,7 +89,7 @@ If passing a custom options object, ensure that the searchable fields are define
 
 # Nothing new here!
 
-The idea for this scope has been previously discussed in various places, such as [🔗 other](https://freek.dev/1182-searching-models-using-a-where-like-query-in-laravel) and [🔗 places](https://laravel-tricks.com/tricks/eloquents-dynamic-scope-search-trait). However, since it can be difficult to locate these resources every time one needs them, I have created a package that simplifies the installation process. It is important to note that this package does not introduce any novel concepts.
+The idea for this scope has been previously discussed in various places, such as [🔗 here](https://freek.dev/1182-searching-models-using-a-where-like-query-in-laravel) and [🔗 here](https://laravel-tricks.com/tricks/eloquents-dynamic-scope-search-trait). However, since it can be difficult to locate these resources every time one needs them, I have created a package that simplifies the installation process. It is important to note that this package does not introduce any novel concepts.
 
 # Testing
 
