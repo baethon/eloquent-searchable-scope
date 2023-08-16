@@ -30,6 +30,7 @@ class SearchableTest extends TestCase
             ['post' => 'Who does the gun belong to?'],
             ['post' => 'Look at that mountain.'],
             ['post' => 'I never for a moment imagined I\'d be able to afford to live in such a fancy house.'],
+            ['post' => 'This gun is the best thing I\'ve seen.'],
         ]);
 
         $results = Post::query()

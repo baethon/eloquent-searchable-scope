@@ -12,7 +12,7 @@ class SearchableHelpers
     {
         $terms = Str::of($search)
             ->trim()
-            ->when($options->breakToWords(), fn (Stringable $str) => $str->split('/\s+/'));
+            ->when($options->shouldBreakToWords(), fn (Stringable $str) => $str->split('/\s+/'));
 
         return Collection::wrap($terms)
             ->filter(fn ($term) => mb_strlen($term) >= $options->getMinTermLength())
