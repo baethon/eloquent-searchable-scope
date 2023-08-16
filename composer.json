@@ -1,6 +1,6 @@
 {
     "name": "baethon/eloquent-searchable-scope",
-    "description": "A dead-simple model scope used for searching",
+    "description": "An Eloquent scope for building a search query using LIKE statements",
     "keywords": ["laravel", "eloquent", "scope", "search"],
     "type": "library",
     "license": "MIT",
